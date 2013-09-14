@@ -4,6 +4,7 @@ import (
 	"net"
 	"fmt"
 	"log"
+	"github.com/AvanceIT/monsrv/secure"
 )
 
 func ExampleHello() {
@@ -25,7 +26,7 @@ func main() {
 		}
 
 		go func(c net.Conn) {
-			fmt.Fprintf(c, "nice\n\n")
+			secure.ClientAuth(c)
 			c.Close()
 		}(conn)
 	}
