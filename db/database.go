@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/AvanceIT/monitor/xmltools"
 	_ "github.com/lib/pq"
+	"strconv"
 )
 
 var dbparms string
@@ -67,10 +68,9 @@ func AddEvent(ev xmltools.MonResult) {
 
 	// Get the host id and client id for the host that has raised
 	// the alert.
-	stmt = "select id,client_id from hosts where name='" + ev.HostName + 
+	stmt = "select id,client_id from hosts where name='" + ev.HostName +
 		"';"
 	rows, err := db.Query(stmt)
-	fmt.Printf("%s\n", stmt)
 	if err != nil {
 		fmt.Printf("Query failed: %v\n", err)
 		return
@@ -82,14 +82,13 @@ func AddEvent(ev xmltools.MonResult) {
 			return
 		}
 	}
-	fmt.Printf("%s, %s\n", hostid, clientid)
 
 	// Insert the event into the events table.
 	stmt = "insert into events(host_id, client_id, time_logged," +
-		"time_alerted, message) values(" + hostid + ", " +
-		clientid + ", '" + ev.TimeRcvd + "', '" + 
-		ev.TimeRptd + "', '" + ev.Detail + "');"
-	fmt.Printf("\n\n\n%s\n\n\n", stmt)
+		"time_alerted, message, alert_level) values(" + hostid +
+		", " + clientid + ", '" + ev.TimeRcvd + "', '" +
+		ev.TimeRptd + "', '" + ev.Detail + "', " +
+		strconv.Itoa(ev.AlertLevel) + ");"
 	rows, err = db.Query(stmt)
 	if err != nil {
 		fmt.Printf("Error inserting into db: %v\n", err)
